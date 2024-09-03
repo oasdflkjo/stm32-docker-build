@@ -1,0 +1,38 @@
+# Build output
+build/
+*.o
+*.d
+*.elf
+*.hex
+*.bin
+*.map
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*~
+
+# Debug files
+*.list
+*.su
+
+# Dependency files
+*.d
+
+# Backup files
+*.bak
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Custom configuration files (if any)
+# config.h
+
+# Libraries (if you want to exclude them)
+# lib/
+
+# Toolchain specific (adjust as needed)
+# *.crf
+# *.axf

@@ -1,0 +1,1 @@
+docker run -it --rm -v ${PWD}:/work -w /work stm32-minimal-builder
