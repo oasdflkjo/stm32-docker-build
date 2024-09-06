@@ -1,7 +1,7 @@
-CC=arm-none-eabi-gcc
+CC=ccache arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 
-CFLAGS=-mcpu=cortex-m3 -mthumb -O0 -g \
+CFLAGS=-mcpu=cortex-m3 -mthumb -O3 -g \
        -Ilib/CMSIS/CMSIS/Core/Include \
        -Ilib/STM32CubeL1/Drivers/STM32L1xx_HAL_Driver/Inc \
        -Ilib/STM32CubeL1/Drivers/CMSIS/Device/ST/STM32L1xx/Include \
