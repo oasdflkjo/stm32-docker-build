@@ -28,19 +28,26 @@ Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-
    cd stm32-blinky-docker
    ```
 
-2. Build the project:
+2. Initialize and update the submodules:
+   ```
+   git submodule init
+   git submodule update
+   ```
+   This will clone the CMSIS and STM32CubeL1 libraries into the `lib/` directory.
+
+3. Build the project:
    ```powershell
    .\build.ps1
    ```
    This script will create the Docker image if it doesn't exist and then build the project inside a Docker container.
 
-3. Flash the program to your STM32 board:
+4. Flash the program to your STM32 board:
    ```powershell
    .\flash.ps1
    ```
    Ensure your STM32 board is connected via ST-LINK before running this script.
 
-4. To build and flash in one step:
+5. To build and flash in one step:
    ```powershell
    .\build_and_flash.ps1
    ```
