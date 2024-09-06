@@ -1,6 +1,6 @@
 # STM32 Blinky with Containerized Build Environment
 
-This project demonstrates a simple STM32 blinky example with a twist: it uses a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
+This project demonstrates a simple STM32 blinky example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
 
 Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-tools/nucleo-l152re.html).
 
@@ -13,14 +13,12 @@ Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-
 - Make as the build tool (future plans for CMake-Ninja or Meson)
 - CMSIS and HAL libraries included for easy start
 
-## Why This Project?
-
-This project was created to provide a simple, reproducible setup for STM32 development. It offers an alternative to IDEs like Keil or STM32CubeIDE, focusing on a more flexible, command-line based approach.
-
 ## Prerequisites
 
 - Docker
 - Git
+- PowerShell
+- ST-LINK Utility (for flashing)
 
 ## Usage
 
@@ -30,22 +28,23 @@ This project was created to provide a simple, reproducible setup for STM32 devel
    cd stm32-blinky-docker
    ```
 
-2. Build the Docker image:
+2. Build the project:
+   ```powershell
+   .\build.ps1
    ```
-   docker build -t stm32-build-env .
-   ```
+   This script will create the Docker image if it doesn't exist and then build the project inside a Docker container.
 
-3. Run the Docker container:
+3. Flash the program to your STM32 board:
+   ```powershell
+   .\flash.ps1
    ```
-   docker run -it --rm -v $(pwd):/work stm32-build-env
-   ```
+   Ensure your STM32 board is connected via ST-LINK before running this script.
 
-4. Inside the container, build the project:
+4. To build and flash in one step:
+   ```powershell
+   .\build_and_flash.ps1
    ```
-   make
-   ```
-
-5. The compiled binary will be available in the `build` directory.
+   This script will build the project and then flash it to your STM32 board.
 
 ## Project Structure
 
@@ -54,6 +53,9 @@ This project was created to provide a simple, reproducible setup for STM32 devel
 - `lib/`: CMSIS and HAL libraries
 - `Dockerfile`: Defines the build environment
 - `Makefile`: Build configuration
+- `build.ps1`: PowerShell script for building the project
+- `flash.ps1`: PowerShell script for flashing the program
+- `build_and_flash.ps1`: PowerShell script that combines building and flashing
 
 ## TODO
 
