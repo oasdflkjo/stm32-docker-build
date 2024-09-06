@@ -1,3 +1,30 @@
+/**
+  ******************************************************************************
+  * @file      startup_stm32l152xe.s
+  * @author    MCD Application Team
+  * @brief     STM32L152XE Devices vector table for GCC toolchain.
+  *            This module performs:
+  *                - Set the initial SP
+  *                - Set the initial PC == Reset_Handler,
+  *                - Set the vector table entries with the exceptions ISR address
+  *                - Configure the clock system
+  *                - Branches to main in the C library (which eventually
+  *                  calls main()).
+  *            After Reset the Cortex-M3 processor is in Thread mode,
+  *            priority is Privileged, and the Stack is set to Main.
+  ******************************************************************************
+  * @attention
+  *
+  * Copyright (c) 2017 STMicroelectronics.
+  * All rights reserved.
+  *
+  * This software is licensed under terms that can be found in the LICENSE file
+  * in the root directory of this software component.
+  * If no LICENSE file comes with this software, it is provided AS-IS.
+  *
+  ******************************************************************************
+  */
+
   .syntax unified
   .cpu cortex-m3
   .fpu softvfp
@@ -18,67 +45,82 @@ defined in linker script */
 /* end address for the .bss section. defined in linker script */
 .word _ebss
 
+.equ  BootRAM, 0xF108F85F
+/**
+ * @brief  This is the code that gets called when the processor first
+ *          starts execution following a reset event. Only the absolutely
+ *          necessary set is performed, after which the application
+ *          supplied main() routine is called.
+ * @param  None
+ * @retval : None
+*/
+
   .section .text.Reset_Handler
   .weak Reset_Handler
   .type Reset_Handler, %function
 Reset_Handler:
-  ldr   r0, =_estack
-  mov   sp, r0          /* set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
-  ldr r0, =_sdata
-  ldr r1, =_edata
-  ldr r2, =_sidata
-  movs r3, #0
+  movs r1, #0
   b LoopCopyDataInit
 
 CopyDataInit:
-  ldr r4, [r2, r3]
-  str r4, [r0, r3]
-  adds r3, r3, #4
+  ldr r3, =_sidata
+  ldr r3, [r3, r1]
+  str r3, [r0, r1]
+  adds r1, r1, #4
 
 LoopCopyDataInit:
-  adds r4, r0, r3
-  cmp r4, r1
+  ldr r0, =_sdata
+  ldr r3, =_edata
+  adds r2, r0, r1
+  cmp r2, r3
   bcc CopyDataInit
-
-/* Zero fill the bss segment. */
   ldr r2, =_sbss
-  ldr r4, =_ebss
-  movs r3, #0
   b LoopFillZerobss
-
+/* Zero fill the bss segment. */
 FillZerobss:
-  str  r3, [r2]
-  adds r2, r2, #4
+  movs r3, #0
+  str r3, [r2], #4
 
 LoopFillZerobss:
-  cmp r2, r4
+  ldr r3, = _ebss
+  cmp r2, r3
   bcc FillZerobss
 
 /* Call the clock system initialization function.*/
-  bl  SystemInit
+    bl  SystemInit
 /* Call static constructors */
-  bl __libc_init_array
+    bl __libc_init_array
 /* Call the application's entry point.*/
   bl main
-
-LoopForever:
-    b LoopForever
-
+  bx lr
 .size Reset_Handler, .-Reset_Handler
 
-/* Exception Handlers */
-
-  .section .text.Default_Handler,"ax",%progbits
+/**
+ * @brief  This is the code that gets called when the processor receives an
+ *         unexpected interrupt.  This simply enters an infinite loop, preserving
+ *         the system state for examination by a debugger.
+ *
+ * @param  None
+ * @retval : None
+*/
+    .section .text.Default_Handler,"ax",%progbits
 Default_Handler:
 Infinite_Loop:
   b Infinite_Loop
   .size Default_Handler, .-Default_Handler
-
-  .section .isr_vector,"a",%progbits
+/******************************************************************************
+*
+* The minimal vector table for a Cortex M3.  Note that the proper constructs
+* must be placed on this to ensure that it ends up at physical address
+* 0x0000.0000.
+*
+******************************************************************************/
+   .section .isr_vector,"a",%progbits
   .type g_pfnVectors, %object
   .size g_pfnVectors, .-g_pfnVectors
+
 
 g_pfnVectors:
   .word _estack
@@ -97,8 +139,6 @@ g_pfnVectors:
   .word 0
   .word PendSV_Handler
   .word SysTick_Handler
-
-  /* External Interrupts */
   .word WWDG_IRQHandler
   .word PVD_IRQHandler
   .word TAMPER_STAMP_IRQHandler
@@ -123,7 +163,7 @@ g_pfnVectors:
   .word DAC_IRQHandler
   .word COMP_IRQHandler
   .word EXTI9_5_IRQHandler
-  .word LCD_IRQHandler
+  .word LCD_IRQHandler  
   .word TIM9_IRQHandler
   .word TIM10_IRQHandler
   .word TIM11_IRQHandler
@@ -144,6 +184,33 @@ g_pfnVectors:
   .word USB_FS_WKUP_IRQHandler
   .word TIM6_IRQHandler
   .word TIM7_IRQHandler
+  .word 0
+  .word TIM5_IRQHandler
+  .word SPI3_IRQHandler
+  .word UART4_IRQHandler
+  .word UART5_IRQHandler
+  .word DMA2_Channel1_IRQHandler
+  .word DMA2_Channel2_IRQHandler
+  .word DMA2_Channel3_IRQHandler
+  .word DMA2_Channel4_IRQHandler
+  .word DMA2_Channel5_IRQHandler
+  .word 0
+  .word COMP_ACQ_IRQHandler
+  .word 0
+  .word 0
+  .word 0
+  .word 0
+  .word 0
+  .word BootRAM          /* @0x108. This is for boot in RAM mode for 
+                            STM32L152XE devices. */
+
+/*******************************************************************************
+*
+* Provide weak aliases for each Exception handler to the Default_Handler.
+* As they are weak aliases, any function with the same name will override
+* this definition.
+*
+*******************************************************************************/
 
   .weak NMI_Handler
   .thumb_set NMI_Handler,Default_Handler
@@ -245,7 +312,7 @@ g_pfnVectors:
   .thumb_set EXTI9_5_IRQHandler,Default_Handler
 
   .weak LCD_IRQHandler
-  .thumb_set LCD_IRQHandler,Default_Handler
+  .thumb_set LCD_IRQHandler,Default_Handler  
 
   .weak TIM9_IRQHandler
   .thumb_set TIM9_IRQHandler,Default_Handler
@@ -306,3 +373,33 @@ g_pfnVectors:
 
   .weak TIM7_IRQHandler
   .thumb_set TIM7_IRQHandler,Default_Handler
+
+  .weak TIM5_IRQHandler
+  .thumb_set TIM5_IRQHandler,Default_Handler
+  
+  .weak SPI3_IRQHandler
+  .thumb_set SPI3_IRQHandler,Default_Handler
+
+  .weak UART4_IRQHandler
+  .thumb_set UART4_IRQHandler,Default_Handler
+
+  .weak UART5_IRQHandler
+  .thumb_set UART5_IRQHandler,Default_Handler
+  
+  .weak DMA2_Channel1_IRQHandler
+  .thumb_set DMA2_Channel1_IRQHandler,Default_Handler
+
+  .weak DMA2_Channel2_IRQHandler
+  .thumb_set DMA2_Channel2_IRQHandler,Default_Handler
+
+  .weak DMA2_Channel3_IRQHandler
+  .thumb_set DMA2_Channel3_IRQHandler,Default_Handler
+
+  .weak DMA2_Channel4_IRQHandler
+  .thumb_set DMA2_Channel4_IRQHandler,Default_Handler
+
+  .weak DMA2_Channel5_IRQHandler
+  .thumb_set DMA2_Channel5_IRQHandler,Default_Handler
+
+  .weak COMP_ACQ_IRQHandler
+   .thumb_set COMP_ACQ_IRQHandler,Default_Handler

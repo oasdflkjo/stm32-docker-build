@@ -1,11 +1,12 @@
-CC=arm-none-eabi-gcc
+CC=ccache arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 
-CFLAGS=-mcpu=cortex-m3 -mthumb -O0 -g \
+CFLAGS=-mcpu=cortex-m3 -mthumb -O3 -g \
        -Ilib/CMSIS/CMSIS/Core/Include \
        -Ilib/STM32CubeL1/Drivers/STM32L1xx_HAL_Driver/Inc \
        -Ilib/STM32CubeL1/Drivers/CMSIS/Device/ST/STM32L1xx/Include \
-       -Iinclude \
+       -Ilib/STM32CubeL1/Drivers/BSP/STM32L1xx_Nucleo \
+       -Iinc \
        -DSTM32L152xE -DUSE_HAL_DRIVER
 
 LDFLAGS=-T lib/STM32CubeL1/Projects/NUCLEO-L152RE/Templates/SW4STM32/STM32L152RE_NUCLEO/STM32L152RETx_FLASH.ld \
@@ -37,7 +38,7 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: $(HAL_SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(BUILD_DIR)/startup_stm32l152xe.o: $(SRC_DIR)/startup_stm32l152xe.s | $(BUILD_DIR)
+$(BUILD_DIR)/startup_stm32l152xe.o: SW4STM32/startup_stm32l152xe.s | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR):
