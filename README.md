@@ -59,7 +59,7 @@ Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152
 
 - `src/`: Source files
 - `include/`: Header files
-- `lib/`: CMSIS and HAL libraries
+- `lib/`: CMSIS and HAL libraries as submodule
 - `Dockerfile`: Defines the build environment
 - `Makefile`: Build configuration
 - `build.ps1`: PowerShell script for building the project
