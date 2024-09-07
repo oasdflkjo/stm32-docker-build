@@ -1,5 +1,5 @@
-#include "stm32l1xx.h"
 #include <stdint.h>
+#include "stm32l1xx.h"
 
 #if !defined(HSE_VALUE)
 #define HSE_VALUE ((uint32_t)8000000U)
@@ -13,7 +13,8 @@
 
 uint32_t SystemCoreClock = 32000000;
 const uint8_t PLLMulTable[9] = {3U, 4U, 6U, 8U, 12U, 16U, 24U, 32U, 48U};
-const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
+const uint8_t AHBPrescTable[16] = {0U, 0U, 0U, 0U, 0U, 0U, 0U, 0U,
+                                   1U, 2U, 3U, 4U, 6U, 7U, 8U, 9U};
 const uint8_t APBPrescTable[8] = {0U, 0U, 0U, 0U, 1U, 2U, 3U, 4U};
 
 #if defined(STM32L151xD) || defined(STM32L152xD) || defined(STM32L162xD)
@@ -22,8 +23,7 @@ static void SystemInit_ExtMemCtl(void);
 #endif
 #endif
 
-void SystemInit(void)
-{
+void SystemInit(void) {
   RCC->CR |= (uint32_t)0x00000100;
 
   RCC->CFGR &= (uint32_t)0x88FFC00C;
@@ -47,45 +47,40 @@ void SystemInit(void)
 #endif
 }
 
-void SystemCoreClockUpdate(void)
-{
+void SystemCoreClockUpdate(void) {
   uint32_t tmp = 0, pllmul = 0, plldiv = 0, pllsource = 0, msirange = 0;
 
   tmp = RCC->CFGR & RCC_CFGR_SWS;
 
-  switch (tmp)
-  {
-  case 0x00:
-    msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> 13;
-    SystemCoreClock = (32768 * (1 << (msirange + 1)));
-    break;
-  case 0x04:
-    SystemCoreClock = HSI_VALUE;
-    break;
-  case 0x08:
-    SystemCoreClock = HSE_VALUE;
-    break;
-  case 0x0C:
-    pllmul = RCC->CFGR & RCC_CFGR_PLLMUL;
-    plldiv = RCC->CFGR & RCC_CFGR_PLLDIV;
-    pllmul = PLLMulTable[(pllmul >> 18)];
-    plldiv = (plldiv >> 22) + 1;
+  switch (tmp) {
+    case 0x00:
+      msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> 13;
+      SystemCoreClock = (32768 * (1 << (msirange + 1)));
+      break;
+    case 0x04:
+      SystemCoreClock = HSI_VALUE;
+      break;
+    case 0x08:
+      SystemCoreClock = HSE_VALUE;
+      break;
+    case 0x0C:
+      pllmul = RCC->CFGR & RCC_CFGR_PLLMUL;
+      plldiv = RCC->CFGR & RCC_CFGR_PLLDIV;
+      pllmul = PLLMulTable[(pllmul >> 18)];
+      plldiv = (plldiv >> 22) + 1;
 
-    pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
+      pllsource = RCC->CFGR & RCC_CFGR_PLLSRC;
 
-    if (pllsource == 0x00)
-    {
-      SystemCoreClock = (((HSI_VALUE)*pllmul) / plldiv);
-    }
-    else
-    {
-      SystemCoreClock = (((HSE_VALUE)*pllmul) / plldiv);
-    }
-    break;
-  default:
-    msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> 13;
-    SystemCoreClock = (32768 * (1 << (msirange + 1)));
-    break;
+      if (pllsource == 0x00) {
+        SystemCoreClock = (((HSI_VALUE)*pllmul) / plldiv);
+      } else {
+        SystemCoreClock = (((HSE_VALUE)*pllmul) / plldiv);
+      }
+      break;
+    default:
+      msirange = (RCC->ICSCR & RCC_ICSCR_MSIRANGE) >> 13;
+      SystemCoreClock = (32768 * (1 << (msirange + 1)));
+      break;
   }
   tmp = AHBPrescTable[((RCC->CFGR & RCC_CFGR_HPRE) >> 4)];
   SystemCoreClock >>= tmp;
