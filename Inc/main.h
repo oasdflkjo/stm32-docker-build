@@ -27,6 +27,26 @@
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/
 /* Exported macro ------------------------------------------------------------*/
+/* USER CODE BEGIN EM */
+
+/* USER CODE END EM */
+
 /* Exported functions ------------------------------------------------------- */
+void Error_Handler(void);
+
+/* USER CODE BEGIN EFP */
+
+/* USER CODE END EFP */
+
+/* Private defines -----------------------------------------------------------*/
+/* USER CODE BEGIN Private defines */
+
+/* USER CODE END Private defines */
+
+extern UART_HandleTypeDef huart2;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* __MAIN_H */
