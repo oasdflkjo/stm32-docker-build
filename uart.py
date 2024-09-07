@@ -3,10 +3,15 @@ import sys
 
 def main(port, baudrate):
     ser = serial.Serial(port, baudrate)
-    while True:
-        if ser.in_waiting > 0:
-            data = ser.read(ser.in_waiting).decode('utf-8')
-            print(data, end='')
+    try:
+        while True:
+            if ser.in_waiting > 0:
+                data = ser.read(ser.in_waiting).decode('utf-8')
+                print(data, end='')
+    except KeyboardInterrupt:
+        print("\nExiting...")
+    finally:
+        ser.close()
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
