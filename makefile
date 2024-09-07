@@ -2,7 +2,7 @@ CC=ccache arm-none-eabi-gcc
 OBJCOPY=arm-none-eabi-objcopy
 
 CFLAGS=-mcpu=cortex-m3 -mthumb -O3 -g \
-       -Ilib/CMSIS/CMSIS/Core/Include \
+       -Ilib/STM32CubeL1/Drivers/CMSIS/Core/Include \
        -Ilib/STM32CubeL1/Drivers/STM32L1xx_HAL_Driver/Inc \
        -Ilib/STM32CubeL1/Drivers/CMSIS/Device/ST/STM32L1xx/Include \
        -Ilib/STM32CubeL1/Drivers/BSP/STM32L1xx_Nucleo \
@@ -20,7 +20,17 @@ SRCS = $(wildcard $(SRC_DIR)/*.c)
 HAL_SRCS = $(HAL_SRC_DIR)/stm32l1xx_hal.c \
            $(HAL_SRC_DIR)/stm32l1xx_hal_cortex.c \
            $(HAL_SRC_DIR)/stm32l1xx_hal_gpio.c \
-           $(HAL_SRC_DIR)/stm32l1xx_hal_rcc.c
+           $(HAL_SRC_DIR)/stm32l1xx_hal_rcc.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_uart.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_dma.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_flash.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_flash_ex.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_flash_ramfunc.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_pwr.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_pwr_ex.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_rcc_ex.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_rcc_ex.c \
+
 
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 HAL_OBJS = $(patsubst $(HAL_SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(HAL_SRCS))
