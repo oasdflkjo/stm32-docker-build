@@ -3,7 +3,8 @@
 This project demonstrates a simple STM32 blinky example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
 
 Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-tools/nucleo-l152re.html).
-Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152RE/)
+
+Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152RE/).
 
 ## Features
 
