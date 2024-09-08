@@ -1,6 +1,6 @@
 #include "main.h"
-#include <stdlib.h>
 #include "ssd1306.h"
+#include "graphics.h"
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_dma.h"
 #include "stm32l1xx_hal_gpio.h"
@@ -15,7 +15,6 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_I2C1_Init(void);
-void FlipDisplayBuffer(void);
 
 #define SSD1306_I2C_ADDR 0x3C  // Define the I2C address of the OLED display
 
@@ -28,27 +27,11 @@ int main(void) {
   MX_I2C1_Init();
 
   SSD1306_Init(&hi2c1, SSD1306_I2C_ADDR);
-
-  uint8_t* display_buffer = SSD1306_GetBuffer();
-
-  // Fill the left half of the screen
-  for (int i = 0; i < SSD1306_BUFFER_SIZE / 2; i++) {
-    display_buffer[i] = 0xFF;  // Set all bits to 1
-  }
-
-  // Clear the right half of the screen
-  for (int i = SSD1306_BUFFER_SIZE / 2; i < SSD1306_BUFFER_SIZE; i++) {
-    display_buffer[i] = 0x00;  // Set all bits to 0
-  }
-
-  SSD1306_SendBufferToDisplay();
+  Graphics_Init(SSD1306_GetBuffer());
 
   while (1) {
-    HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-    HAL_Delay(1000);
-
-    FlipDisplayBuffer();
-    SSD1306_SendBufferToDisplay();
+    Graphics_Run();
+    HAL_Delay(50);  // Add a small delay to control the animation speed
   }
 }
 
