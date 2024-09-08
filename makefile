@@ -29,7 +29,7 @@ HAL_SRCS = $(HAL_SRC_DIR)/stm32l1xx_hal.c \
            $(HAL_SRC_DIR)/stm32l1xx_hal_pwr.c \
            $(HAL_SRC_DIR)/stm32l1xx_hal_pwr_ex.c \
            $(HAL_SRC_DIR)/stm32l1xx_hal_rcc_ex.c \
-           $(HAL_SRC_DIR)/stm32l1xx_hal_rcc_ex.c \
+           $(HAL_SRC_DIR)/stm32l1xx_hal_i2c.c
 
 
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
