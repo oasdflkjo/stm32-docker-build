@@ -26,20 +26,29 @@ static const uint8_t ssd1306_init_sequence[] = {
     0xAF         // Display on
 };
 
-static void SSD1306_WriteCommand(uint8_t command) {
+static inline HAL_StatusTypeDef SSD1306_WriteCommand(uint8_t command) {
     uint8_t data[2] = {0x00, command};
     HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, data, 2, HAL_MAX_DELAY);
 }
 
-static void SSD1306_WriteData(uint8_t* data, uint16_t size) {
+static inline HAL_StatusTypeDef SSD1306_WriteData(uint8_t* data, uint16_t size) {
     uint8_t buffer[65];  // Max 64 bytes of data + 1 byte for data control
     if (size > 64) {
         // Handle error: data too large
-        return;
+        return HAL_ERROR;
     }
     buffer[0] = 0x40;  // 0x40 for data
     memcpy(buffer + 1, data, size);
     HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, buffer, size + 1, HAL_MAX_DELAY);
+}
+
+static inline void SSD1306_SetAddressRange(uint8_t col_start, uint8_t col_end, uint8_t page_start, uint8_t page_end) {
+    SSD1306_WriteCommand(0x21);  // Set column address
+    SSD1306_WriteCommand(col_start);  // Start at col_start
+    SSD1306_WriteCommand(col_end);  // End at col_end
+    SSD1306_WriteCommand(0x22);  // Set page address
+    SSD1306_WriteCommand(page_start);  // Start at page_start
+    SSD1306_WriteCommand(page_end);  // End at page_end
 }
 
 void SSD1306_Init(I2C_HandleTypeDef *hi2c, uint8_t address) {
@@ -55,11 +64,11 @@ void SSD1306_Init(I2C_HandleTypeDef *hi2c, uint8_t address) {
     SSD1306_SendBufferToDisplay();
 }
 
-void SSD1306_DisplayOn(void) {
+void SSD1306_TurnOnDisplay(void) {
     SSD1306_WriteCommand(0xAF);
 }
 
-void SSD1306_DisplayOff(void) {
+void SSD1306_TurnOffDisplay(void) {
     SSD1306_WriteCommand(0xAE);
 }
 
@@ -68,14 +77,7 @@ uint8_t* SSD1306_GetBuffer(void) {
 }
 
 void SSD1306_SendBufferToDisplay(void) {
-    SSD1306_WriteCommand(0x20);  // Set memory addressing mode
-    SSD1306_WriteCommand(0x00);  // Horizontal addressing mode
-    SSD1306_WriteCommand(0x21);  // Set column address
-    SSD1306_WriteCommand(0);     // Start at 0
-    SSD1306_WriteCommand(127);   // End at 127
-    SSD1306_WriteCommand(0x22);  // Set page address
-    SSD1306_WriteCommand(0);     // Start at 0
-    SSD1306_WriteCommand(7);     // End at 7
+    SSD1306_SetAddressRange(0, 127, 0, 7);
 
     for (uint16_t i = 0; i < SSD1306_BUFFER_SIZE; i += 64) {
         SSD1306_WriteData(&ssd1306_buffer[i], 64);

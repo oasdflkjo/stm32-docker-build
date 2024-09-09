@@ -11,9 +11,9 @@
 
 // Function prototypes
 void SSD1306_Init(I2C_HandleTypeDef *hi2c, uint8_t address);
-void SSD1306_DisplayOn(void);
-void SSD1306_DisplayOff(void);
+void SSD1306_TurnOnDisplay(void);
+void SSD1306_TurnOffDisplay(void);
 uint8_t* SSD1306_GetBuffer(void);
-void SSD1306_SendBufferToDisplay(void);  // Remove the I2C_HandleTypeDef parameter
+void SSD1306_SendBufferToDisplay(void);
 
 #endif // SSD1306_H
