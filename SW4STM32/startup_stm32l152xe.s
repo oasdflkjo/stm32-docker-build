@@ -88,6 +88,15 @@ LoopFillZerobss:
   cmp r2, r3
   bcc FillZerobss
 
+/* Stamp the stack with a known pattern */
+  ldr r0, =_estack   // Load the end of stack address
+  ldr r1, =_sstack   // Load the start of stack address (you may need to define this in your linker script)
+  ldr r2, =0xDEADBEEF // Our stack stamp pattern
+stamp_stack_loop:
+  str r2, [r0, #-4]! // Store the pattern and decrement the address
+  cmp r0, r1
+  bgt stamp_stack_loop
+
 /* Call the clock system initialization function.*/
     bl  SystemInit
 /* Call static constructors */

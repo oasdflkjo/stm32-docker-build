@@ -1,15 +1,37 @@
 #include "main.h"
+#include <stdio.h>
 #include <string.h>
 #include "stm32l1xx_hal.h"
 #include "stm32l1xx_hal_dma.h"
 #include "stm32l1xx_hal_gpio.h"
 #include "stm32l1xx_hal_uart.h"
+#include <stdint.h>
 
 UART_HandleTypeDef huart2;
 
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
+
+extern uint32_t _sstack;  // Start of stack (defined in linker script)
+extern uint32_t _estack;  // End of stack (defined in linker script)
+
+#define STACK_STAMP 0xDEADBEEF
+
+uint32_t check_stack_usage(void) {
+    uint32_t *stack_ptr = &_sstack;
+    uint32_t *stack_end = &_estack;
+    uint32_t stack_size = stack_end - stack_ptr;
+    uint32_t used_stack = 0;
+
+    while (stack_ptr < stack_end && *stack_ptr != STACK_STAMP) {
+        stack_ptr++;
+        used_stack++;
+    }
+
+    // Calculate percentage with 10% accuracy
+    return (used_stack * 10 + stack_size / 2) / stack_size;
+}
 
 int main(void) {
   HAL_Init();
@@ -18,11 +40,16 @@ int main(void) {
   MX_GPIO_Init();
   MX_USART2_UART_Init();
 
-  char* msg = "Hello, UART!\r\n";
+  char msg[50];
+  uint32_t stack_usage;
 
   while (1) {
     HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
+    
+    stack_usage = check_stack_usage();
+    snprintf(msg, sizeof(msg), "Stack usage: %lu0%%\r\n", stack_usage);
     HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+    
     HAL_Delay(1000);
   }
 }
