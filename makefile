@@ -35,12 +35,20 @@ HAL_SRCS = $(HAL_SRC_DIR)/stm32l1xx_hal.c \
 OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 HAL_OBJS = $(patsubst $(HAL_SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(HAL_SRCS))
 
-all: $(BUILD_DIR)/main.elf
+FLASH_SIZE = 524288  # 512 KB in bytes
+
+all: $(BUILD_DIR)/main.elf size_info
 
 $(BUILD_DIR)/main.elf: $(OBJS) $(HAL_OBJS) $(BUILD_DIR)/startup_stm32l152xe.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/main.hex
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/main.bin
+
+size_info: $(BUILD_DIR)/main.bin
+	@echo "Binary size:"
+	@ls -l $(BUILD_DIR)/main.bin | awk '{print $$5 " bytes"}'
+	@echo "Flash usage:"
+	@ls -l $(BUILD_DIR)/main.bin | awk '{printf "%.2f%%\n", ($$5 / $(FLASH_SIZE)) * 100}'
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
@@ -57,4 +65,4 @@ $(BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean
+.PHONY: all clean size_info
