@@ -35,6 +35,13 @@ Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152
    git submodule init
    git submodule update
    ```
+   run commands again in submodules directory   
+   ```
+   cd lib/STM32CubeL1
+   git submodule init
+   git submodule update
+   ```
+
    This will clone the CMSIS and STM32CubeL1 libraries into the `lib/` directory.
 
 3. Build the project:
