@@ -1,0 +1,23 @@
+{
+    "name": "STM32 Development",
+    "build": {
+        "dockerfile": "../dockerfile",
+        "context": ".."
+    },
+    "runArgs": [
+        "--privileged"
+    ],
+    "mounts": [
+        "source=/dev,target=/dev,type=bind"
+    ],
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "marus25.cortex-debug",
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-extension-pack"
+            ]
+        }
+    },
+    "remoteUser": "root"
+}

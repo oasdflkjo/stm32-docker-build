@@ -7,10 +7,12 @@ CFLAGS=-mcpu=cortex-m3 -mthumb -O3 -g \
        -Ilib/STM32CubeL1/Drivers/CMSIS/Device/ST/STM32L1xx/Include \
        -Ilib/STM32CubeL1/Drivers/BSP/STM32L1xx_Nucleo \
        -Iinc \
-       -DSTM32L152xE -DUSE_HAL_DRIVER
+       -DSTM32L152xE -DUSE_HAL_DRIVER \
+       -g3 -ggdb
 
 LDFLAGS=-T lib/STM32CubeL1/Projects/NUCLEO-L152RE/Templates/SW4STM32/STM32L152RE_NUCLEO/STM32L152RETx_FLASH.ld \
-        -Wl,--gc-sections
+        -Wl,--gc-sections \
+        -Wl,-Map=$(BUILD_DIR)/main.map
 
 SRC_DIR = src
 HAL_SRC_DIR = lib/STM32CubeL1/Drivers/STM32L1xx_HAL_Driver/Src
