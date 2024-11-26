@@ -16,6 +16,7 @@ Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152
 - ccache for faster compilations with caching
 - Make as the build tool (future plans for CMake-Ninja or Meson)
 - CMSIS and HAL libraries included for easy start
+- Minimalist driver for ssd1306
 - Memory usage info on builds
 ```
 Memory Usage Analysis
