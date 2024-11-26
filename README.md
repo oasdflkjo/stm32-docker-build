@@ -35,7 +35,7 @@ Total RAM usage: 1644 bytes
 
 - Docker
 - Git
-- PowerShell
+- PowerShell :)
 - ST-LINK Utility (for flashing)
 
 ## Usage
