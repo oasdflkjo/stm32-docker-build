@@ -2,9 +2,30 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "build",
+            "label": "build fast",
             "type": "shell",
             "command": "make",
+            "args": ["fast"],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build debug",
+            "type": "shell",
+            "command": "make",
+            "args": ["debug"],
+            "group": "build",
+            "problemMatcher": [
+                "$gcc"
+            ]
+        },
+        {
+            "label": "build small",
+            "type": "shell",
+            "command": "make",
+            "args": ["small"],
             "group": "build",
             "problemMatcher": [
                 "$gcc"
