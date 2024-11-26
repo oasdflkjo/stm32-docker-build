@@ -49,16 +49,7 @@ $(BUILD_DIR)/main.elf: $(OBJS) $(HAL_OBJS) $(BUILD_DIR)/startup_stm32l152xe.o
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/main.hex
 	$(OBJCOPY) -O binary $@ $(BUILD_DIR)/main.bin
 	$(SIZE) $@
-	@echo "Calculating flash usage..."
-	@bash -c '\
-	    FLASH_SIZE=524288; \
-	    read -r text data <<< "$$(arm-none-eabi-size $@ | awk '\''/build\/main\.elf/ {print $$1, $$2}'\'')"; \
-	    if [ -z "$$text" ] || [ -z "$$data" ]; then \
-	        echo "Error: Unable to calculate flash usage."; \
-	        exit 1; \
-	    fi; \
-	    USAGE=$$(bc <<< "scale=2; ($$text + $$data) * 100 / $$FLASH_SIZE"); \
-	    echo "Flash usage: $$USAGE%"'
+	@./scripts/analyze_memory.sh $(BUILD_DIR)/main.elf $(BUILD_DIR)/main.map
 
 
 
