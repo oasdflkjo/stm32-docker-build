@@ -1,4 +1,6 @@
-# STM32 Blinky with Containerized Build Environment
+# STM32 Spinning Cube with Containerized Build Environment
+
+![Blinky Demo](assets/demo.gif)
 
 This project demonstrates a simple STM32 blinky example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
 
