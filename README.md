@@ -2,7 +2,7 @@
 
 ![Blinky Demo](assets/demo.gif)
 
-This project demonstrates a simple STM32 blinky example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
+This project demonstrates a simple STM32 spinning cube example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
 
 Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-tools/nucleo-l152re.html).
 
