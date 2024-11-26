@@ -16,6 +16,20 @@ Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152
 - ccache for faster compilations with caching
 - Make as the build tool (future plans for CMake-Ninja or Meson)
 - CMSIS and HAL libraries included for easy start
+- Memory usage info on builds
+```
+Memory Usage Analysis
+====================
+Free FLASH: 478.86 KB (490360 bytes, 93.52%)
+Free RAM: 30.39 KB (31124 bytes, 94.98%)
+
+Detailed Memory Analysis
+Text (Flash) size: 32424 bytes
+Data size: 12 bytes
+BSS size: 1632 bytes
+Stack size: 0 bytes
+Total RAM usage: 1644 bytes
+```
 
 ## Prerequisites
 
