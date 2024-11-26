@@ -72,25 +72,6 @@ Total RAM usage: 1644 bytes
    ```
    This script will build the project and then flash it to your STM32 board.
 
-## Project Structure
-
-- `src/`: Source files
-- `include/`: Header files
-- `lib/`: CMSIS and HAL libraries as submodule
-- `Dockerfile`: Defines the build environment
-- `Makefile`: Build configuration
-- `build.ps1`: PowerShell script for building the project
-- `flash.ps1`: PowerShell script for flashing the program
-- `build_and_flash.ps1`: PowerShell script that combines building and flashing
-
-## TODO
-
-- Implement FreeRTOS variant
-- Consider migrating to CMake-Ninja or Meson for more advanced build configurations
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
