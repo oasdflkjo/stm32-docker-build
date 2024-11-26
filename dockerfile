@@ -1,3 +1,4 @@
+# stm32-build-env
 FROM ubuntu:24.04
 
 # Add repository for ST tools
@@ -19,10 +20,10 @@ RUN apt-get update && apt-get install -y \
     linux-tools-generic \
     hwdata \
     git \
-    # Add ST-LINK tools
     stlink-tools \
     stlink-gui \
     gdb-arm-none-eabi \
+    bc \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 

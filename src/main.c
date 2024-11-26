@@ -31,7 +31,7 @@ int main(void) {
 
   while (1) {
     Graphics_Run();
-    HAL_Delay(50);  // Add a small delay to control the animation speed
+    //HAL_Delay(50);  // Add a small delay to control the animation speed
   }
 }
 
