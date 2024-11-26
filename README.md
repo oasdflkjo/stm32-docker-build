@@ -54,24 +54,7 @@ Total RAM usage: 1644 bytes
    ```
    This will clone the CMSIS and STM32CubeL1 libraries into the `lib/` directory.
 
-3. Build the project:
-   ```powershell
-   .\build.ps1
-   ```
-   This script will create the Docker image if it doesn't exist and then build the project inside a Docker container.
-
-4. Flash the program to your STM32 board:
-   ```powershell
-   .\flash.ps1
-   ```
-   Ensure your STM32 board is connected via ST-LINK before running this script.
-
-5. To build and flash in one step:
-   ```powershell
-   .\build_and_flash.ps1
-   ```
-   This script will build the project and then flash it to your STM32 board.
-
+3. TODO...
 
 ## License
 
