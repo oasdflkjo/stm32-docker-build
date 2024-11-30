@@ -1,24 +1,22 @@
 #include "graphics.h"
-#include "ssd1306.h"
 #include <string.h>
 #include <stdint.h>
 #include <stdlib.h>
 #include <math.h>
 
-#define SSD1306_WIDTH 128
-#define SSD1306_HEIGHT 64
-#define BUFFER_SIZE (SSD1306_WIDTH * SSD1306_HEIGHT / 8)
+static DisplayConfig* display = NULL;
 
 #define SCALE_FACTOR 128
-#define TRANSLATE_X (SSD1306_WIDTH / 2)
-#define TRANSLATE_Y (SSD1306_HEIGHT / 2)
+#define TRANSLATE_X (display->width / 2)
+#define TRANSLATE_Y (display->height / 2)
 
 #define X_ROTATE_SPEED 0.03f
 #define Y_ROTATE_SPEED 0.08f
-#define Z_ROTATE_SPEED 0.13f
+#define Z_ROTATE_SPEED 0.01f
 #define PROJECTION_DISTANCE 7.0f
+#define MIN_Z_DISTANCE 2.0f
 
-static uint8_t* display_buffer;
+static uint8_t* display_buffer = NULL;
 static uint32_t frame_count = 0;
 
 typedef struct {
@@ -42,21 +40,20 @@ static void ClearBuffer(void);
 static void UpdateSpinningCube(void);
 static void DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1);
 
-void Graphics_Init(uint8_t* buffer) {
-    display_buffer = buffer;
+void Graphics_Init(DisplayConfig* config) {
+    display = config;
     ClearBuffer();
-    SSD1306_SendBufferToDisplay();
 }
 
-void Graphics_Run(void) {
+void Graphics_Update(void) {
     ClearBuffer();
     UpdateSpinningCube();
-    SSD1306_SendBufferToDisplay();
     frame_count++;
 }
 
 static void ClearBuffer(void) {
-    memset(display_buffer, 0, BUFFER_SIZE);
+    uint32_t buffer_size = (display->width * display->height) / 8;
+    memset(display->buffer, 0, buffer_size);
 }
 
 static void UpdateSpinningCube(void) {
@@ -111,10 +108,10 @@ static void DrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1) {
     int16_t e2;
 
     while (1) {
-        if (x0 >= 0 && x0 < SSD1306_WIDTH && y0 >= 0 && y0 < SSD1306_HEIGHT) {
-            uint16_t byte_index = x0 + (y0 / 8) * SSD1306_WIDTH;
+        if (x0 >= 0 && x0 < display->width && y0 >= 0 && y0 < display->height) {
+            uint16_t byte_index = x0 + (y0 / 8) * display->width;
             uint8_t bit_position = y0 % 8;
-            display_buffer[byte_index] |= (1 << bit_position);
+            display->buffer[byte_index] |= (1 << bit_position);
         }
 
         if (x0 == x1 && y0 == y1) break;

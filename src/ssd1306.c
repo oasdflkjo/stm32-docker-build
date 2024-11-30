@@ -1,6 +1,9 @@
 #include "ssd1306.h"
 #include <string.h>
 
+// Display configuration constants
+#define SSD1306_WIDTH    128
+#define SSD1306_HEIGHT   64
 #define SSD1306_BUFFER_SIZE (SSD1306_WIDTH * SSD1306_HEIGHT / 8)
 
 static uint8_t ssd1306_buffer[SSD1306_BUFFER_SIZE];
@@ -51,9 +54,17 @@ static inline void SSD1306_SetAddressRange(uint8_t col_start, uint8_t col_end, u
     SSD1306_WriteCommand(page_end);  // End at page_end
 }
 
+// Add display configuration struct
+static DisplayConfig display_config = {
+    .width = SSD1306_WIDTH,
+    .height = SSD1306_HEIGHT,
+    .buffer = NULL
+};
+
 void SSD1306_Init(I2C_HandleTypeDef *hi2c, uint8_t address) {
     ssd1306_i2c = hi2c;
     ssd1306_i2c_addr = address << 1;  // Convert 7-bit address to 8-bit
+    display_config.buffer = ssd1306_buffer;  // Set the buffer pointer
     HAL_Delay(100);  // Wait for the display to power up
 
     for (uint8_t i = 0; i < sizeof(ssd1306_init_sequence); i++) {
@@ -82,4 +93,8 @@ void SSD1306_SendBufferToDisplay(void) {
     for (uint16_t i = 0; i < SSD1306_BUFFER_SIZE; i += 64) {
         SSD1306_WriteData(&ssd1306_buffer[i], 64);
     }
+}
+
+DisplayConfig* SSD1306_GetDisplayConfig(void) {
+    return &display_config;
 }

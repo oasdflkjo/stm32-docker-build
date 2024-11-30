@@ -1,12 +1,12 @@
 #ifndef GRAPHICS_H
 #define GRAPHICS_H
 
-#include "ssd1306.h"
 #include <stdint.h>
+#include "ssd1306.h"  // For DisplayConfig
 
-#define SSD1306_BUFFER_SIZE (SSD1306_WIDTH * SSD1306_HEIGHT / 8)
-
-void Graphics_Init(uint8_t* buffer);
-void Graphics_Run(void);
+// bind the display configuration to the graphics driver
+void Graphics_Init(DisplayConfig* display);
+// update the buffer
+void Graphics_Update(void);
 
 #endif // GRAPHICS_H

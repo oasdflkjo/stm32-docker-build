@@ -27,11 +27,12 @@ int main(void) {
   MX_I2C1_Init();
 
   SSD1306_Init(&hi2c1, SSD1306_I2C_ADDR);
-  Graphics_Init(SSD1306_GetBuffer());
+  Graphics_Init(SSD1306_GetDisplayConfig());
 
   while (1) {
-    Graphics_Run();
-    HAL_Delay(50);  // Add a small delay to control the animation speed
+    Graphics_Update();
+    SSD1306_SendBufferToDisplay();
+    //HAL_Delay(1);
   }
 }
 
@@ -129,11 +130,4 @@ void Error_Handler(void) {
 
 static void UART_Transmit(const char* msg) {
   HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
-}
-
-void FlipDisplayBuffer(void) {
-  uint8_t* display_buffer = SSD1306_GetBuffer();
-  for (int i = 0; i < SSD1306_BUFFER_SIZE; i++) {
-    display_buffer[i] = ~display_buffer[i];
-  }
 }
