@@ -2,11 +2,12 @@
 #define GRAPHICS_H
 
 #include <stdint.h>
-#include "ssd1306.h"  // For DisplayConfig
+#include "ssd1306.h"
 
-// bind the display configuration to the graphics driver
+// Initialize graphics with display configuration
 void Graphics_Init(DisplayConfig* display);
-// update the buffer
+
+// Update graphics frame
 void Graphics_Update(void);
 
 #endif // GRAPHICS_H

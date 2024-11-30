@@ -31,27 +31,39 @@ static const uint8_t ssd1306_init_sequence[] = {
 
 static inline HAL_StatusTypeDef SSD1306_WriteCommand(uint8_t command) {
     uint8_t data[2] = {0x00, command};
-    HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, data, 2, HAL_MAX_DELAY);
+    return HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, data, 2, HAL_MAX_DELAY);
 }
 
 static inline HAL_StatusTypeDef SSD1306_WriteData(uint8_t* data, uint16_t size) {
     uint8_t buffer[65];  // Max 64 bytes of data + 1 byte for data control
     if (size > 64) {
-        // Handle error: data too large
         return HAL_ERROR;
     }
     buffer[0] = 0x40;  // 0x40 for data
     memcpy(buffer + 1, data, size);
-    HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, buffer, size + 1, HAL_MAX_DELAY);
+    return HAL_I2C_Master_Transmit(ssd1306_i2c, ssd1306_i2c_addr, buffer, size + 1, HAL_MAX_DELAY);
 }
 
-static inline void SSD1306_SetAddressRange(uint8_t col_start, uint8_t col_end, uint8_t page_start, uint8_t page_end) {
-    SSD1306_WriteCommand(0x21);  // Set column address
-    SSD1306_WriteCommand(col_start);  // Start at col_start
-    SSD1306_WriteCommand(col_end);  // End at col_end
-    SSD1306_WriteCommand(0x22);  // Set page address
-    SSD1306_WriteCommand(page_start);  // Start at page_start
-    SSD1306_WriteCommand(page_end);  // End at page_end
+static inline HAL_StatusTypeDef SSD1306_SetAddressRange(uint8_t col_start, uint8_t col_end, 
+                                                       uint8_t page_start, uint8_t page_end) {
+    HAL_StatusTypeDef status;
+    
+    status = SSD1306_WriteCommand(0x21);  // Set column address
+    if (status != HAL_OK) return status;
+    
+    status = SSD1306_WriteCommand(col_start);
+    if (status != HAL_OK) return status;
+    
+    status = SSD1306_WriteCommand(col_end);
+    if (status != HAL_OK) return status;
+    
+    status = SSD1306_WriteCommand(0x22);  // Set page address
+    if (status != HAL_OK) return status;
+    
+    status = SSD1306_WriteCommand(page_start);
+    if (status != HAL_OK) return status;
+    
+    return SSD1306_WriteCommand(page_end);
 }
 
 // Add display configuration struct
@@ -62,15 +74,23 @@ static DisplayConfig display_config = {
 };
 
 void SSD1306_Init(I2C_HandleTypeDef *hi2c, uint8_t address) {
+    HAL_StatusTypeDef status;
+    
     ssd1306_i2c = hi2c;
     ssd1306_i2c_addr = address << 1;  // Convert 7-bit address to 8-bit
-    display_config.buffer = ssd1306_buffer;  // Set the buffer pointer
-    HAL_Delay(100);  // Wait for the display to power up
+    display_config.buffer = ssd1306_buffer;
+    
+    HAL_Delay(100);  // Wait for display power-up
 
+    // Send init sequence
     for (uint8_t i = 0; i < sizeof(ssd1306_init_sequence); i++) {
-        SSD1306_WriteCommand(ssd1306_init_sequence[i]);
+        status = SSD1306_WriteCommand(ssd1306_init_sequence[i]);
+        if (status != HAL_OK) {
+            Error_Handler();  // Handle I2C error
+        }
     }
 
+    // Clear display
     memset(ssd1306_buffer, 0, SSD1306_BUFFER_SIZE);
     SSD1306_SendBufferToDisplay();
 }
