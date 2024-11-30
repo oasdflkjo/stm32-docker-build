@@ -32,7 +32,9 @@ RUN apt-get update && apt-get install -y \
 # Create alternatives for usbip
 RUN update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
 
-
 WORKDIR /workspaces
+
+# Copy the project files into the container
+COPY . .
 
 CMD ["bash"]
