@@ -1,3 +1,4 @@
+[![Unit Tests](https://github.com/oasdflkjo/stm32-docker-build/actions/workflows/test.yml/badge.svg)](https://github.com/oasdflkjo/stm32-docker-build/actions/workflows/test.yml)
 # STM32 Spinning Cube with Containerized Build Environment
 
 ![Blinky Demo](assets/demo.gif)
