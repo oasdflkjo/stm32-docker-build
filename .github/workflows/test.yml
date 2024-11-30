@@ -5,7 +5,7 @@ on:
     branches: [ '*' ]
   pull_request:
     branches: [ '*' ]
-  workflow_dispatch:    # Add this line to enable manual triggers
+  workflow_dispatch:
 
 jobs:
   test:
@@ -19,4 +19,10 @@ jobs:
     - name: Build and run tests
       run: |
         docker build -t stm32-build .
+        # Debug: Check files in container
+        docker run --rm stm32-build ls -la /workspaces
+        docker run --rm stm32-build ls -la /workspaces/inc
+        docker run --rm stm32-build ls -la /workspaces/src
+        docker run --rm stm32-build ls -la /workspaces/tests
+        # Run tests
         docker run --rm stm32-build make test
