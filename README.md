@@ -18,6 +18,8 @@ Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152
 - Make as the build tool (future plans for CMake-Ninja or Meson)
 - CMSIS and HAL libraries included for easy start
 - Minimalist driver for ssd1306
+- Unit testing support with Unity framework
+- Continuous Integration with GitHub Actions
 - Memory usage info on builds
 ```
 Memory Usage Analysis
