@@ -61,7 +61,12 @@
             "args": [
                 "-f", "/usr/share/openocd/scripts/interface/stlink.cfg",
                 "-f", "/usr/share/openocd/scripts/target/stm32l1.cfg",
-                "-c", "program build/main.bin verify reset exit"
+                "-c", "init",
+                "-c", "reset halt",
+                "-c", "flash write_image erase build/main.bin 0x08000000",
+                "-c", "verify_image build/main.bin 0x08000000",
+                "-c", "reset run",
+                "-c", "shutdown"
             ],
             "problemMatcher": [],
             "group": {
