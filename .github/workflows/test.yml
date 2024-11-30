@@ -16,13 +16,10 @@ jobs:
       with:
         submodules: 'recursive'  # Important for Unity framework
     
-    - name: Build and run tests
+    - name: Install dependencies
       run: |
-        docker build -t stm32-build .
-        # Debug: Check files in container
-        docker run --rm stm32-build ls -la /workspaces
-        docker run --rm stm32-build ls -la /workspaces/inc
-        docker run --rm stm32-build ls -la /workspaces/src
-        docker run --rm stm32-build ls -la /workspaces/tests
-        # Run tests
-        docker run --rm stm32-build make test
+        sudo apt-get update
+        sudo apt-get install -y gcc make
+
+    - name: Run tests
+      run: make test
