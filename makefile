@@ -44,6 +44,26 @@ debug: $(BUILD_DIR)/main.elf
 small: CFLAGS += -Os
 small: $(BUILD_DIR)/main.elf
 
+# Test configuration
+TEST_DIR = tests
+TEST_BUILD_DIR = $(BUILD_DIR)/tests
+TEST_CC = gcc
+TEST_CFLAGS = -I$(TEST_DIR) \
+              -I$(TEST_DIR)/mocks \
+              -Ilib/Unity/src \
+              -Iinc \
+              -DUNIT_TEST
+
+# Test target
+test: $(BUILD_DIR)
+	mkdir -p $(TEST_BUILD_DIR)
+	gcc -Itests -Itests/mocks -Ilib/Unity/src -Iinc -DUNIT_TEST \
+		lib/Unity/src/unity.c \
+		tests/unit/test_graphics.c \
+		src/graphics.c \
+		-o $(TEST_BUILD_DIR)/test_graphics -lm
+	./$(TEST_BUILD_DIR)/test_graphics
+
 $(BUILD_DIR)/main.elf: $(OBJS) $(HAL_OBJS) $(BUILD_DIR)/startup_stm32l152xe.o
 	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
 	$(OBJCOPY) -O ihex $@ $(BUILD_DIR)/main.hex
@@ -68,7 +88,7 @@ $(BUILD_DIR):
 clean:
 	rm -rf $(BUILD_DIR)
 
-.PHONY: all clean fast debug small
+.PHONY: all clean fast debug small test
 
 # Note: MAKEFLAGS is set to use 16 threads by default for Ryzen 7 5700X3D.
 # Adjust the number of jobs (-j) according to your CPU's capabilities if needed.

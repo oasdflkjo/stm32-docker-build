@@ -24,11 +24,14 @@ RUN apt-get update && apt-get install -y \
     stlink-gui \
     gdb-arm-none-eabi \
     bc \
+    gcc \
+    libc6-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # Create alternatives for usbip
 RUN update-alternatives --install /usr/local/bin/usbip usbip /usr/lib/linux-tools/*-generic/usbip 20
+
 
 WORKDIR /workspaces
 
