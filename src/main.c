@@ -1,34 +1,45 @@
 #include "main.h"
 #include "init.h"
-#include "uart_commands.h"
+#include "uart.h"
+#include "shell.h"
 
-UART_HandleTypeDef huart2;
-I2C_HandleTypeDef hi2c1;
+static inline void delay(uint32_t count)
+{
+    while(count--) { __NOP(); }
+}
 
-int main(void) {
-    // Initialize HAL and Clock
-    HAL_Init();
+int main(void)
+{
+    /* Configure System Clock */
     SystemClock_Config();
     
-    // Initialize peripherals
+    /* Initialize GPIO */
     MX_GPIO_Init();
+    
+    /* Initialize UART */
     MX_USART2_UART_Init();
     
-    // Initialize UART command interface
-    UARTCmd_Init(&huart2);
+    /* LED on - indicate system is ready */
+    LL_GPIO_SetOutputPin(GPIOA, LL_GPIO_PIN_5);
     
-    // LED on - indicate system is ready
-    HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+    /* Initialize shell */
+    Shell_Init();
     
-    // Main loop
-    while (1) {
-        UARTCmd_Process();
+    /* Main loop */
+    while (1)
+    {
+        Shell_Process();
+        // LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_5);
+        // delay(500000);  // Reduced delay for better responsiveness
     }
 }
 
-void Error_Handler(void) {
-    while (1) {
-        HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_5);
-        HAL_Delay(100);
+void Error_Handler(void)
+{
+    UART_Print("ERROR: System halted\r\n");
+    while (1)
+    {
+        LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_5);
+        delay(100000); // Fast blink delay
     }
 }
