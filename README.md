@@ -1,62 +1,19 @@
-[![Unit Tests](https://github.com/oasdflkjo/stm32-docker-build/actions/workflows/test.yml/badge.svg)](https://github.com/oasdflkjo/stm32-docker-build/actions/workflows/test.yml)
-# STM32 Spinning Cube with Containerized Build Environment
+# STM32 EEPROM Image Storage Demo
 
-![Blinky Demo](assets/demo.gif)
+This branch demonstrates storing and displaying images using AT24C256 EEPROM and SSD1306 OLED display.
 
-This project demonstrates a simple STM32 spinning cube example with a containerized cross-compilation build environment. This approach simplifies setup and ensures consistency across different development machines.
+![Demo Setup](assets/image.png)
 
-Project is based on [STM32L152RE Nucleo board](https://www.st.com/en/evaluation-tools/nucleo-l152re.html).
+## What it Does
 
-Pinout from mbed [STM32L152RE MBED](https://os.mbed.com/platforms/ST-Nucleo-L152RE/).
+1. Takes a PNG image and converts it to a C header file using a Python script
+2. Writes the image data to AT24C256 EEPROM
+3. Reads the image back from EEPROM
+4. Displays it on the SSD1306 OLED screen
 
-## Features
+## Components Used
 
-- STM32L152RE microcontroller target
-- Containerized build environment using Docker
-- gcc-arm-none-eabi toolchain for cross-compilation
-- ccache for faster compilations with caching
-- Make as the build tool (future plans for CMake-Ninja or Meson)
-- CMSIS and HAL libraries included for easy start
-- Minimalist driver for ssd1306
-- Memory usage info on builds
-```
-Memory Usage Analysis
-====================
-Free FLASH: 478.86 KB (490360 bytes, 93.52%)
-Free RAM: 30.39 KB (31124 bytes, 94.98%)
-
-Detailed Memory Analysis
-Text (Flash) size: 32424 bytes
-Data size: 12 bytes
-BSS size: 1632 bytes
-Stack size: 0 bytes
-Total RAM usage: 1644 bytes
-```
-
-## Prerequisites
-
-- Docker
-- Git
-- PowerShell :)
-- ST-LINK Utility (for flashing)
-
-## Usage
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/stm32-blinky-docker.git
-   cd stm32-blinky-docker
-   ```
-
-2. Initialize and update the submodules:
-   ```
-   git submodule init
-   git submodule update --init --recursive
-   ```
-   This will clone the CMSIS and STM32CubeL1 libraries into the `lib/` directory.
-
-3. TODO...
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
+- STM32L152RE Nucleo board
+- SSD1306 OLED Display (128x64)
+- AT24C256 EEPROM
+- Both connected via I2C1 (SCL: PB8, SDA: PB9)

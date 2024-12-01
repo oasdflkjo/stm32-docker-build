@@ -9,14 +9,26 @@
 #include "stm32l1xx_hal_rcc.h"
 #include "stm32l1xx_hal_pwr.h"
 #include <string.h>
+#include <stdio.h>
+#include "at24c256.h"
+#include "image.h"
 
 UART_HandleTypeDef huart2;
 I2C_HandleTypeDef hi2c1;
 
+#define DISPLAY_WIDTH  128
+#define DISPLAY_HEIGHT 64
+
+static uint8_t image_buffer[IMAGE_SIZE];  // Buffer to hold the image data
+
+// Function declarations
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static HAL_StatusTypeDef MX_I2C1_Init(void);
+static void UART_Transmit(const char* msg);
+static void print_buffer(const char* prefix, uint8_t* buffer, uint16_t size);
+void WriteImageToEEPROM(const uint8_t* image_data);
 
 #define SSD1306_I2C_ADDR 0x3C  // Define the I2C address of the OLED display
 
@@ -28,36 +40,73 @@ static HAL_StatusTypeDef MX_I2C1_Init(void);
 #define I2C_SDA_PORT               GPIOB
 #define I2C_SDA_PIN                GPIO_PIN_9
 
+static char debug_str[32];  // Move from main() to global scope
+
+// Add this function to convert from byte-per-pixel to packed format
+static void ConvertToDisplayFormat(const uint8_t* source, uint8_t* dest) {
+    for (int y = 0; y < DISPLAY_HEIGHT; y += 8) {
+        for (int x = 0; x < DISPLAY_WIDTH; x++) {
+            uint8_t packed_byte = 0;
+            // Pack 8 vertical pixels into one byte
+            for (int bit = 0; bit < 8; bit++) {
+                if (source[x + (y + bit) * DISPLAY_WIDTH] > 0) {
+                    packed_byte |= (1 << bit);
+                }
+            }
+            dest[x + (y/8) * DISPLAY_WIDTH] = packed_byte;
+        }
+    }
+}
+
 int main(void) {
     HAL_StatusTypeDef status;
+    uint8_t* display_buffer;  // Will get this from SSD1306 driver
 
     // Initialize HAL
     HAL_Init();
     SystemClock_Config();
-
-    // Initialize GPIO for LED
     MX_GPIO_Init();
+    MX_USART2_UART_Init();
     
-    // Initialize LED to OFF
-    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
-
     // Initialize I2C
     status = MX_I2C1_Init();
     if (status != HAL_OK) {
-        Error_Handler();  // LED will blink to indicate error
-    }
-
-    if (HAL_I2C_IsDeviceReady(&hi2c1, SSD1306_I2C_ADDR << 1, 1, 100) != HAL_OK) {
         Error_Handler();
     }
 
-    // Initialize display
-    SSD1306_Init(&hi2c1, SSD1306_I2C_ADDR);
-    Graphics_Init(SSD1306_GetDisplayConfig());
+    // Initialize EEPROM
+    if (AT24C256_Init(&hi2c1) != AT24C256_OK) {
+        Error_Handler();
+    }
 
+    // LED on - indicate starting EEPROM write
+    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_SET);
+    
+    // Write the checkerboard pattern to EEPROM
+    WriteImageToEEPROM(image_data);
+    
+    // LED off - EEPROM write complete
+    HAL_GPIO_WritePin(LED_GPIO_PORT, LED_PIN, GPIO_PIN_RESET);
+
+    // Initialize OLED display
+    SSD1306_Init(&hi2c1, SSD1306_I2C_ADDR);
+    display_buffer = SSD1306_GetBuffer();  // Get the display's buffer
+
+    // Read image from EEPROM into temporary buffer
+    if (AT24C256_Read(0x0000, image_buffer, IMAGE_SIZE) != AT24C256_OK) {
+        Error_Handler();
+    }
+
+    // Convert from byte-per-pixel to OLED format directly into display buffer
+    ConvertToDisplayFormat(image_buffer, display_buffer);
+
+    // Send to display using the driver's function
+    SSD1306_SendBufferToDisplay();
+    
+    // If we get here, everything worked!
     while (1) {
-        Graphics_Update();
-        SSD1306_SendBufferToDisplay();
+        HAL_GPIO_TogglePin(LED_GPIO_PORT, LED_PIN);  // Blink LED to show success
+        HAL_Delay(500);
     }
 }
 
@@ -174,4 +223,35 @@ void Error_Handler(void) {
 
 static void UART_Transmit(const char* msg) {
   HAL_UART_Transmit(&huart2, (uint8_t*)msg, strlen(msg), HAL_MAX_DELAY);
+}
+
+static void print_buffer(const char* prefix, uint8_t* buffer, uint16_t size) {
+    static char debug_str[64];  // Make the buffer static
+    sprintf(debug_str, "%s: ", prefix);
+    UART_Transmit(debug_str);
+    
+    for(uint16_t i = 0; i < size; i++) {
+        sprintf(debug_str, "%02X ", buffer[i]);
+        UART_Transmit(debug_str);
+    }
+    UART_Transmit("\r\n");
+}
+
+// Add this utility function to write the image to EEPROM
+void WriteImageToEEPROM(const uint8_t* image_data) {
+    // Write the image data to EEPROM
+    if (AT24C256_Write(0x0000, (uint8_t*)image_data, IMAGE_SIZE) != AT24C256_OK) {
+        Error_Handler();
+    }
+    
+    // Verify the write
+    uint8_t verify_buffer[IMAGE_SIZE];
+    if (AT24C256_Read(0x0000, verify_buffer, IMAGE_SIZE) != AT24C256_OK) {
+        Error_Handler();
+    }
+    
+    // Compare written data
+    if (memcmp(image_data, verify_buffer, IMAGE_SIZE) != 0) {
+        Error_Handler();
+    }
 }
