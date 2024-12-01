@@ -2,7 +2,7 @@
 
 This branch demonstrates storing and displaying images using AT24C256 EEPROM and SSD1306 OLED display.
 
-![Demo Setup](assets/image.png)
+<img src="assets/image.png" width="50%">
 
 ## What it Does
 
