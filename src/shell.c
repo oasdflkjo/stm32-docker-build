@@ -1,5 +1,7 @@
 #include "shell.h"
 #include "uart.h"
+#include "flash.h"
+#include <stdio.h>
 #include <string.h>
 
 #define HISTORY_SIZE 8
@@ -43,6 +45,8 @@ static void cmd_help(char *args);
 static void cmd_info(char *args);
 static void cmd_reset(char *args);
 static void cmd_led(char *args);
+static void cmd_dump(char *args);
+static void cmd_jump(char *args);
 
 // Command table
 static const shell_cmd_t commands[] = {
@@ -50,6 +54,8 @@ static const shell_cmd_t commands[] = {
     {"info", cmd_info, "Show bootloader info"},
     {"reset", cmd_reset, "Reset the device"},
     {"led", cmd_led, "Control LED (on/off/toggle)"},
+    {"dump", cmd_dump, "Dump flash memory in Intel HEX format"},
+    {"jump", cmd_jump, "Jump to application"},
     {NULL, NULL, NULL}
 };
 
@@ -272,6 +278,83 @@ static void cmd_led(char *args)
     else {
         UART_Print("Unknown LED command. Use: on, off, or toggle\r\n");
     }
+}
+
+static void cmd_dump(char *args) {
+    uint32_t start_addr = FLASH_BASE;  // 0x08000000
+    uint32_t length = 16384;           // 16KB - bootloader size
+    char hex_buffer[10];               // Buffer for hex conversion
+    
+    UART_Print("Dumping flash contents:\r\n");
+    
+    uint8_t *ptr = (uint8_t *)start_addr;
+    for (uint32_t i = 0; i < length; i += 16) {
+        // Print address
+        UART_Print("0x");
+        for (int j = 28; j >= 0; j -= 4) {
+            hex_buffer[0] = "0123456789ABCDEF"[(((uint32_t)(ptr + i)) >> j) & 0xF];
+            hex_buffer[1] = '\0';
+            UART_Print(hex_buffer);
+        }
+        UART_Print(": ");
+        
+        // Print hex values
+        for (uint32_t j = 0; j < 16; j++) {
+            hex_buffer[0] = "0123456789ABCDEF"[ptr[i + j] >> 4];
+            hex_buffer[1] = "0123456789ABCDEF"[ptr[i + j] & 0xF];
+            hex_buffer[2] = ' ';
+            hex_buffer[3] = '\0';
+            UART_Print(hex_buffer);
+        }
+        
+        // Print ASCII
+        UART_Print(" |");
+        for (uint32_t j = 0; j < 16; j++) {
+            char c = ptr[i + j];
+            hex_buffer[0] = (c >= 32 && c <= 126) ? c : '.';
+            hex_buffer[1] = '\0';
+            UART_Print(hex_buffer);
+        }
+        UART_Print("|\r\n");
+        
+        // Small delay to not overwhelm UART
+        for(volatile int d = 0; d < 1000; d++);
+    }
+    
+    UART_Print("\r\nDump complete.\r\n");
+}
+
+static void cmd_jump(char *args) {
+    uint32_t app_address = 0x08004000;  // Application start address
+    
+    UART_Print("Jumping to application...\r\n");
+    
+    // Get the application stack pointer and reset handler
+    uint32_t *app_vector_table = (uint32_t*)app_address;
+    uint32_t app_stack_pointer = app_vector_table[0];
+    uint32_t app_reset_handler = app_vector_table[1];
+    
+    // Basic validation
+    if ((app_stack_pointer & 0x2FFE0000) != 0x20000000) {
+        UART_Print("Error: Invalid stack pointer\r\n");
+        return;
+    }
+    
+    // Disable interrupts
+    __disable_irq();
+    
+    // Reset peripherals (optional)
+    HAL_DeInit();
+    
+    // Set vector table offset
+    SCB->VTOR = app_address;
+    
+    // Set stack pointer
+    __set_MSP(app_stack_pointer);
+    
+    // Jump to application
+    void (*app_reset_handler_ptr)(void) = (void*)app_reset_handler;
+    app_reset_handler_ptr();
 }
 
 static void handle_tab(void)
