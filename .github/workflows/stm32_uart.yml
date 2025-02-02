@@ -1,0 +1,19 @@
+name: STM32 UART Test
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test-uart:
+    runs-on: self-hosted
+    steps:
+      - name: Run STM32 UART Test
+        run: python3 ~/actions-runner/stm32_uart_test.py
+
+      - name: Upload Bootloader Log
+        uses: actions/upload-artifact@v3
+        with:
+          name: stm32-uart-log
+          path: /tmp/stm32_uart_log.txt
