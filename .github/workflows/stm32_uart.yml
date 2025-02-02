@@ -9,10 +9,9 @@ on:
 
 jobs:
   test-uart:
-    runs-on: self-hosted
+    runs-on: [self-hosted, Linux, ARM64]
     steps:
       - uses: actions/checkout@v4
-      
       - name: Run STM32 UART Test
         run: python3 ~/actions-runner/stm32_uart_test.py
 
@@ -21,3 +20,4 @@ jobs:
         with:
           name: stm32-uart-log
           path: /tmp/stm32_uart_log.txt
+
