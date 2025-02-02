@@ -1,0 +1,13 @@
+name: Test Self-Hosted Runner
+
+on:
+  push:
+    branches: [ '*' ]
+  workflow_dispatch:
+
+jobs:
+  test-runner:
+    runs-on: self-hosted
+    steps:
+      - name: Print Runner Info
+        run: uname -a
